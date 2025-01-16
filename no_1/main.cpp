@@ -31,6 +31,7 @@ static int run(int Ans)
 {
 	int N, M, K;
 	scanf("%d %d %d", &N, &M, &K);
+	printf("N = %d, M = %d, K = %d\n", N, M, K);
 
 	for (int i = 0; i < N; ++i) {
 		int num;
@@ -83,7 +84,7 @@ static int run(int Ans)
 int main()
 {
 	setbuf(stdout, NULL);
-	//freopen("sample_input.txt", "r", stdin);
+	freopen("C:/Users/jhshin/Desktop/secret/SWEA/no_1/sample_input_1.txt", "r", stdin);
 
 	int T, Ans;
 	scanf("%d %d", &T, &Ans);
