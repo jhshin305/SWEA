@@ -109,4 +109,5 @@ Result findTreasureChest(int Pieces[MAX_M][MAX_M])
             }
         }
     }
+	return res;
 }
