@@ -29,6 +29,7 @@ static bool run()
     bool okay = false;
 	for (int q = 0; q < Q; ++q)
 	{
+		// printf("q: %d\n", q);
 		int cmd;
 		scanf("%d", &cmd);
 		switch(cmd)
@@ -73,7 +74,7 @@ static bool run()
 int main()
 {
     setbuf(stdout, NULL);
-    //freopen("sample_input.txt", "r", stdin);
+    freopen("C:/Users/jhshin/Desktop/secret/SWEA/no_2/sample_input_2.txt", "r", stdin);
 
     int T, MARK;
     scanf("%d%d", &T, &MARK);
