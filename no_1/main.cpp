@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#include <time.h>
 
 #define MAX_N 1000
 #define MAX_M 20
@@ -31,7 +32,6 @@ static int run(int Ans)
 {
 	int N, M, K;
 	scanf("%d %d %d", &N, &M, &K);
-	printf("N = %d, M = %d, K = %d\n", N, M, K);
 
 	for (int i = 0; i < N; ++i) {
 		int num;
@@ -83,6 +83,8 @@ static int run(int Ans)
 
 int main()
 {
+	clock_t start, end;
+	start = clock();
 	setbuf(stdout, NULL);
 	freopen("C:/Users/jhshin/Desktop/secret/SWEA/no_1/sample_input_1.txt", "r", stdin);
 
@@ -92,6 +94,7 @@ int main()
 	for (int tc = 1; tc <= T; tc++) {
 		printf("#%d %d\n", tc, run(Ans));
 	}
-
+	end = clock();
+	printf("time: %f\n", (double)(end - start) / CLOCKS_PER_SEC);
 	return 0;
 }
