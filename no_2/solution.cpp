@@ -2,12 +2,12 @@
 
 using namespace std;
 
-const int MAX_W = 200;
-const int MAX_H = 200;
+#define MAX_W 200
+#define MAX_H 200
 
-int MoveAndDelete(int mPlayer);
+int MoveAndDelete(const int& mPlayer);
 void MoveToBottom();
-void deleteBlocks(int mPlayer, int blocks[3]);
+void deleteBlocks(const int& mPlayer, int blocks[3]);
 int deleteVertical(int mh, int mw);
 int deleteHorizontal(int mh, int mw);
 int deleteDownwardRightDiagonal(int mh, int mw);
@@ -20,6 +20,7 @@ struct Point {
 int w, h;
 int board[MAX_H][MAX_W];
 int scores[3];
+int BlockCnt[2];
 int target;
 int Opponent;
 Point curr;
@@ -35,12 +36,15 @@ void init(int W, int H)
 	scores[0] = 0;
 	scores[1] = 0;
 	scores[2] = 0;
+	BlockCnt[0] = 0;
+	BlockCnt[1] = 0;
 }
 
 int dropBlocks(int mPlayer, int mCol)
 {
 	for(int i=0; i<3; i++) {
 		board[0][mCol+i] = mPlayer;
+		BlockCnt[mPlayer-1]++;
 	}
 
 	return MoveAndDelete(mPlayer);
@@ -50,22 +54,30 @@ int changeBlocks(int mPlayer, int mCol)
 {
 	Opponent = mPlayer == 1 ? 2 : 1;
 	stack<Point> s;
-	if(board[h-1][mCol] == Opponent) s.push({h-1, mCol});
+	if(board[h-1][mCol] == Opponent) {
+		s.push({h-1, mCol});
+		board[h-1][mCol] = mPlayer;
+	}
 	while(!s.empty()) {
 		curr = s.top();
-		board[curr.x][curr.y] = mPlayer;
+		BlockCnt[mPlayer-1]++;
+		BlockCnt[Opponent-1]--;
 		s.pop();
 		if(curr.x-1 >= 0 && board[curr.x-1][curr.y] == Opponent) {
 			s.push({curr.x-1, curr.y});
+			board[curr.x-1][curr.y] = mPlayer;
 		}
 		if(curr.y-1 >= 0 && board[curr.x][curr.y-1] == Opponent) {
 			s.push({curr.x, curr.y-1});
+			board[curr.x][curr.y-1] = mPlayer;
 		}
 		if(curr.y+1 < w && board[curr.x][curr.y+1] == Opponent) {
 			s.push({curr.x, curr.y+1});
+			board[curr.x][curr.y+1] = mPlayer;
 		}
 		if(curr.x+1 < h && board[curr.x+1][curr.y] == Opponent) {
 			s.push({curr.x+1, curr.y});
+			board[curr.x+1][curr.y] = mPlayer;
 		}
 	}
 
@@ -74,19 +86,12 @@ int changeBlocks(int mPlayer, int mCol)
 
 int getResult(int mBlockCnt[2])
 {
-	mBlockCnt[0] = 0;
-	mBlockCnt[1] = 0;
-	for(int j=0; j<w; j++) {
-		for(int i=h-1; i>=0; i--) {
-			if(board[i][j] != 0) {
-				mBlockCnt[abs(board[i][j])-1]++;
-			} else break;
-		}
-	}
+	mBlockCnt[0] = BlockCnt[0];
+	mBlockCnt[1] = BlockCnt[1];
 	return scores[1]>scores[2] ? 1 : scores[1]<scores[2] ? 2 : 0;
 }
 
-int MoveAndDelete(int mPlayer) {
+int MoveAndDelete(const int& mPlayer) {
 	int score = 0;
 
 	while(true) {
@@ -116,7 +121,7 @@ void MoveToBottom() {
 	}
 }
 
-void deleteBlocks(int mPlayer, int blocks[3]) {
+void deleteBlocks(const int& mPlayer, int blocks[3]) {
 	for(int j=0; j<w; j++) {
 		for(int i=h-1; i>=0; i--) {
 			if(board[i][j] != 0) {
@@ -126,6 +131,7 @@ void deleteBlocks(int mPlayer, int blocks[3]) {
 				if(i==h-1 || j==0 || abs(board[i+1][j-1]) != abs(board[i][j])) deleteUpwardRightDiagonal(i, j);
 				if(board[i][j] < 0) {
 					blocks[abs(board[i][j])]++;
+					BlockCnt[abs(board[i][j])-1]--;
 					board[i][j] = 0;
 				}
 			}
