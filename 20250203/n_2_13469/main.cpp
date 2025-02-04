@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#include <time.h>
 
 #define CMD_INIT       100
 #define CMD_INSERT     200
@@ -75,6 +76,8 @@ static bool run()
 
 int main()
 {
+	clock_t start, end;
+	start = clock();
 	setbuf(stdout, NULL);
 	freopen("sample_input.txt", "r", stdin);
 
@@ -86,5 +89,8 @@ int main()
 		int score = run() ? MARK : 0;
 		printf("#%d %d\n", tc, score);
 	}
+	end = clock();
+	printf("time: %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+	
 	return 0;
 }
