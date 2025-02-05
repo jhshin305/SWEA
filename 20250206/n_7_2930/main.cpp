@@ -10,17 +10,38 @@ int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL); cout.tie(NULL);
 	
-	freopen("C:/Users/jhshin/Desktop/secret/swea/20250206/n_7_2930/sample_input.txt", "r", stdin);
+	freopen("sample_input.txt", "r", stdin);
 	
 	int T;
 	cin >> T;
 	for (int test_case=1; test_case<=T; test_case++) {
+		cout << "#" << test_case << " ";
 	
 		int n;
 		cin >> n;
 
-		
-	
+		priority_queue<int> pq;
+
+		for(int i=0; i<n; i++) {
+			int cmd;
+			cin >> cmd;
+			if(cmd == 1) {
+				int num;
+				cin >> num;
+				pq.push(num);
+			}
+			else {
+				if(pq.empty()) {
+					cout << -1 << " ";
+				}
+				else {
+					cout << pq.top() << " ";
+					pq.pop();
+				}
+			}
+		}
+
+		cout << endl;
 	}
 	
 	return 0;
