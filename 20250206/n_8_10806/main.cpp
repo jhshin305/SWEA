@@ -6,13 +6,6 @@ typedef long long ll;
 
 using namespace std;
 
-struct cmp {
-	bool operator()(pair<ll, int>& a, pair<ll, int>& b) {
-		if(a.second == b.second) return a.first > b.first;
-		return a.second > b.second;
-	}
-};
-
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL); cout.tie(NULL);
@@ -25,39 +18,21 @@ int main() {
 	
 		int n;
 		cin >> n;
-		vector<ll> a(n);
+		vector<int> a(n);
 		for(auto &i : a) cin >> i;
-		sort(a.begin(), a.end(), greater<>());
 		int k;
 		cin >> k;
-		int d=1, ans=0;
-		priority_queue<pair<ll, int>, vector<pair<ll, int>>, cmp> pq;
-		vector<int> lo(k+1, INT_MAX);
-		pq.push({k, 0});
-
-		while(!pq.empty()) {
-			pair<ll, int> p = pq.top(); // {k, cnt}
-			lo[p.first] = min(lo[p.first], p.second);
-			if(p.first == 0) {
-				ans = p.second;
-				break;
-			}
+		priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int,int>>> pq;
+		pq.push({0, k});
+		while(pq.top().second) {
+			pair<int, int> p = pq.top(); // {k, cnt}
 			pq.pop();
-			for(auto i : a) {
-				if(p.first%i == 0) {
-					if(lo[p.first/i] > p.second) {
-						pq.push({p.first/i, p.second});
-						lo[p.first/i] = p.second;
-					}
-				}
+			for(const auto& i : a) {
+				pq.push({p.first+p.second%i, p.second/i});
 			}
-			if(lo[p.first-1] > p.second+1)
-			{
-				pq.push({p.first-1, p.second+1});
-				lo[p.first-1] = p.second+1;
-			}
+			pq.push({p.first+p.second, 0});
 		}
-		cout << "#" << test_case << " " << ans << endl;
+		cout << "#" << test_case << " " << pq.top().first << endl;
 	}
 	
 	return 0;
