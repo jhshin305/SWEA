@@ -25,7 +25,7 @@ int main() {
 		priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int,int>>> pq;
 		pq.push({0, k});
 		while(pq.top().second) {
-			pair<int, int> p = pq.top(); // {k, cnt}
+			pair<int, int> p = pq.top();
 			pq.pop();
 			for(const auto& i : a) {
 				pq.push({p.first+p.second%i, p.second/i});
