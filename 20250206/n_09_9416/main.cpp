@@ -3,7 +3,8 @@
 #endif
 
 #include<stdio.h>
-
+#include<bits/stdc++.h>
+using namespace std;
 extern void init(int N);
 extern void follow(int uId1, int uId2, int timestamp);
 extern void makePost(int uId, int pId, int timestamp);
@@ -29,6 +30,7 @@ static int post_arr[200000];
 static int total_post_cnt;
 static int min_post_cnt;
 
+// int t;
 static bool run()
 {
 	int uId1, uId2, pId, pIdList[10], ans_pIdList[10], rand_val;
@@ -120,7 +122,9 @@ static bool run()
 
 				if (ans_pIdList[i] != pIdList[i])
 				{
+					cout << "getFeed error" << endl;
 					ret = false;
+					return ret;
 				}
 			}
 		}
@@ -131,7 +135,7 @@ static bool run()
 
 int main()
 {
-//	freopen("sample_input.txt", "r", stdin);
+	freopen("sample_input.txt", "r", stdin);
 	setbuf(stdout, NULL);
 	int tc;
 	scanf("%d%d", &tc, &answer_score);
