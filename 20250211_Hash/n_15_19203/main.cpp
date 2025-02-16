@@ -84,6 +84,8 @@ static bool run()
 	return correct;
 }
 
+int tc;
+
 int main()
 {
 	setbuf(stdout, NULL);
@@ -92,7 +94,7 @@ int main()
 	int T, MARK;
 	scanf("%d %d", &T, &MARK);
 
-	for (int tc = 1; tc <= T; tc++)
+	for ( tc = 1; tc <= T; tc++)
 	{
 		int score = run() ? MARK : 0;
 		printf("#%d %d\n", tc, score);
