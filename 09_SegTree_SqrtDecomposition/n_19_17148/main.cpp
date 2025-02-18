@@ -3,6 +3,9 @@
 #endif
 
 #include <stdio.h>
+#include <bits/stdc++.h>
+
+using namespace std;
 
 #define CMD_INIT 100
 #define CMD_DESTROY 200
@@ -78,8 +81,10 @@ static int run()
 
 int main()
 {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
 	setbuf(stdout, NULL);
-	//freopen("sample_input.txt", "r", stdin);
+	freopen("sample_input.txt", "r", stdin);
 
 	int T, MARK;
 	scanf("%d %d", &T, &MARK);
