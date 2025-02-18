@@ -76,7 +76,7 @@ void init(int N, int mMap[20][20])
 		for(int j=0; j<n; j++) {
 			for(int l=1; l<4; l++) {
 				if(i+l < n) {
-					s[0][l][i][j]
+					s[0][l][i][j];
 				}
 			}
 		}
