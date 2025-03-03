@@ -1,141 +1,138 @@
 #include <bits/stdc++.h>
 #define ll long long
-#define MAX_NODE 30040
-#define MAX_GROUP 301
+#define INF 1e7
 
 using namespace std;
 
-// vector<int> sGroup[MAX_GROUP];
-// vector<int> connected[MAX_GROUP][31];
-// vector<int> outCon[MAX_GROUP][4];
-int bridge[MAX_GROUP][31][MAX_GROUP][31];
-int cost[MAX_GROUP][31][MAX_GROUP][31];
-// int vst[MAX_GROUP][31];
-int n, k, tc=0;
-int aGroup, bGroup;
-int aNode, bNode;
+vector<array<int,2>> sline[301][31];
+vector<array<int,2>> lline[301][4];
+vector<int> sremoved[301][31];
+vector<int> lremoved[301][4];
+int dist[301][4][4];
 
-void sGroupTime(const int& group) {
-	//dijstra
-	for(int s=1; s<=3; s++) {
-		priority_queue<array<int,2>, vector<array<int,2>>, greater<array<int,2>>> pq; //totalCost, endNode
-		vector<int> c(31, INT_MAX);
-		c[s] = 0;
-		bool vst[31];
-		pq.push({0,s});
-		while(!pq.empty()) {
-			auto q = pq.top();
-			pq.pop();
-			vst[q[1]] = true;
-			c[q[1]] = q[0];
-			for(int e=1; e<=30; e++) {
-				if(vst[e] == true) continue;
-				if(bridge[group][q[1]][group][e] == 0) continue;
-				pq.push({q[0] + bridge[group][q[1]][group][e], e});
-			}
-				// for(auto& i: connected[group][q[1]]) {
-				// 	if(bridge[group][q[1]][group][i%100] > 0 && vst[i%100]==false)
-				// 		pq.push({q[0] + bridge[group][q[1]][group][i%100], i%100});
-				// }
+int n, k;
+int groupA, groupB;
+int cityA, cityB;
+
+void sdijkstra(const int& group) {
+	int d[31];
+	for(int s=1; s<4; s++) {
+		for(int i=1; i<31; i++) {
+			d[i] = INF;
 		}
-		for(int e=1; e<=3; e++) cost[group][s][group][e] = c[e];
+		d[s] = 0;
+		priority_queue<array<int,2>, vector<array<int,2>>, greater<array<int,2>>> pq;
+		pq.push({0, s});
+		while(!pq.empty()) {
+			auto [cost, curr] = pq.top();
+			pq.pop();
+			if(d[curr] != cost) continue;
+			for(auto [ncost, next] : sline[group][curr]) {
+				if(d[next] > cost + ncost) {
+					d[next] = cost + ncost;
+					pq.push({d[next], next});
+				}
+			}
+		}
+		for(int i=1; i<4; i++) {
+			dist[group][s][i] = d[i];
+		}
 	}
 }
 
-void init(int N, int K, int mNodeA[], int mNodeB[], int mTime[])
-{
-	n = N;
-	k = K;
-	tc++;
-
-	for(int i=0; i<MAX_GROUP; i++) {
-		for(int j=0; j<31; j++) {
-			// connected[i][j].clear();
-			for(int k=0; k<MAX_GROUP; k++) {
-				for(int l=0; l<31; l++) {
-					bridge[i][j][k][l] = 0;
-					cost[i][j][k][l] = INT_MAX;
-				}
-			}
-			cost[i][j][i][j] = 0;
+int ldijkstra(int start,  int end) {
+	int d[301][4];
+	for(int i=0; i<=n; i++) {
+		for(int j=1; j<4; j++) {
+			d[i][j] = INF;
 		}
 	}
-	
-	for(int i=0; i<k; i++) {
-		aGroup = mNodeA[i]/100; bGroup = mNodeB[i]/100;
-		aNode = mNodeA[i]%100; bNode = mNodeB[i]%100;
-		// if(aGroup == bGroup) {
-		// 	connected[aGroup][aNode].push_back(mNodeB[i]);
-		// 	connected[bGroup][bNode].push_back(mNodeA[i]);
-		// }
-		// else {
-		// 	outCon[aGroup][aNode].push_back(mNodeB[i]);
-		// 	outCon[bGroup][bNode].push_back(mNodeA[i]);
-		// }
-		bridge[aGroup][aNode][bGroup][bNode] = mTime[i];
-		bridge[bGroup][bNode][aGroup][aNode] = mTime[i];
-		cost[aGroup][aNode][bGroup][bNode] = mTime[i];
-		cost[bGroup][bNode][aGroup][aNode] = mTime[i];
-	}
 
-	for(int g=1; g<=n; g++) sGroupTime(g);
+	d[0][start] = 0;
+	priority_queue<array<int,2>, vector<array<int,2>>, greater<array<int,2>>> pq;
+	pq.push({0, start});
+	while(!pq.empty()) {
+		auto [cost, curr] = pq.top();
+		if(curr==end) return cost;
+		pq.pop();
+		if(d[curr/100][curr%100] != cost) continue;
+		for(auto [ncost, next] : lline[curr/100][curr%100]) {
+			if(d[next/100][next%100] > cost + ncost) {
+				d[next/100][next%100] = cost + ncost;
+				pq.push({d[next/100][next%100], next});
+			}
+		}
+		for(int next=1; next<=3; next++) {
+			if(d[curr/100][next] > cost + dist[curr/100][curr%100][next]) {
+				d[curr/100][next] = cost + dist[curr/100][curr%100][next];
+				pq.push({d[curr/100][next], curr/100*100+next});
+			}
+		}
+	}
+	return d[0][end];
+}
+
+
+void init(int N, int K, int mNodeA[], int mNodeB[], int mTime[])
+{
+	n = N, k = K;
+	for(int i = 0; i < 301; i++) {
+		for(int j = 1; j < 31; j++) {
+			sline[i][j].clear();
+			sremoved[i][j].clear();
+		}
+		for(int j=0; j<4; j++) {
+			lline[i][j].clear();
+			lremoved[i][j].clear();
+			for(int k=0; k<4; k++) {
+				dist[i][j][k] = INF;
+			}
+		}
+	}
+	for(int i = 0; i < K; i++) {
+		groupA = mNodeA[i]/100; groupB = mNodeB[i]/100;
+		cityA = mNodeA[i]%100; cityB = mNodeB[i]%100;
+		if(groupA == groupB) {
+			sline[groupA][cityA].push_back({mTime[i], cityB});
+			sline[groupB][cityB].push_back({mTime[i], cityA});
+		} else {
+			lline[groupA][cityA].push_back({mTime[i], mNodeB[i]});
+			lline[groupB][cityB].push_back({mTime[i], mNodeA[i]});
+		}
+	}
+	for(int i=1; i<=N; i++) sdijkstra(i);
 }
 
 void addLine(int mNodeA, int mNodeB, int mTime)
 {
-	aGroup = mNodeA/100; bGroup = mNodeB/100;
-	aNode = mNodeA%100; bNode = mNodeB%100;
-	// connected[aGroup][aNode].push_back(mNodeB);
-	// connected[bGroup][bNode].push_back(mNodeA);
-	bridge[aGroup][aNode][bGroup][bNode] = mTime;
-	bridge[bGroup][bNode][aGroup][aNode] = mTime;
-
-	if(cost[aGroup][aNode][bGroup][bNode] > mTime) {
-		cost[aGroup][aNode][bGroup][bNode] = mTime;
-		cost[bGroup][bNode][aGroup][aNode] = mTime;
-		if(aGroup == bGroup) sGroupTime(aGroup);
+	groupA = mNodeA/100; groupB = mNodeB/100;
+	cityA = mNodeA%100; cityB = mNodeB%100;
+	if(groupA == groupB) {
+		sline[groupA][cityA].push_back({mTime, cityB});
+		sline[groupB][cityB].push_back({mTime, cityA});
+		sdijkstra(groupA);
+	}
+	else {
+		lline[groupA][cityA].push_back({mTime, mNodeB});
+		lline[groupB][cityB].push_back({mTime, mNodeA});
 	}
 }
 
 void removeLine(int mNodeA, int mNodeB)
 {
-	aGroup = mNodeA/100; bGroup = mNodeB/100;
-	aNode = mNodeA%100; bNode = mNodeB%100;
-
-	if(cost[aGroup][aNode][bGroup][bNode] < bridge[aGroup][aNode][bGroup][bNode]) {
-		cost[aGroup][aNode][bGroup][bNode] = 0;
-		if(aGroup == bGroup) sGroupTime(aGroup);
+	groupA = mNodeA/100; groupB = mNodeB/100;
+	cityA = mNodeA%100; cityB = mNodeB%100;
+	if(groupA == groupB) {
+		sline[groupA][cityA].erase(remove_if(sline[groupA][cityA].begin(), sline[groupA][cityA].end(), [&](array<int,2> a) { return a[1] == cityB; }), sline[groupA][cityA].end());
+		sline[groupB][cityB].erase(remove_if(sline[groupB][cityB].begin(), sline[groupB][cityB].end(), [&](array<int,2> a) { return a[1] == cityA; }), sline[groupB][cityB].end());
+		sdijkstra(groupA);
+	} else {
+		lline[groupA][cityA].erase(remove_if(lline[groupA][cityA].begin(), lline[groupA][cityA].end(), [&](array<int,2> a) { return a[1] == mNodeB; }), lline[groupA][cityA].end());
+		lline[groupB][cityB].erase(remove_if(lline[groupB][cityB].begin(), lline[groupB][cityB].end(), [&](array<int,2> a) { return a[1] == mNodeA; }), lline[groupB][cityB].end());
 	}
-
-	bridge[aGroup][aNode][bGroup][bNode] = 0;
-	bridge[bGroup][bNode][aGroup][aNode] = 0;
 }
 
 int checkTime(int mNodeA, int mNodeB)
 {
-	priority_queue<array<int,2>, vector<array<int,2>>, greater<array<int,2>>> pq; //totalCost, endNode
-	vector<int> c(MAX_GROUP*4, INT_MAX);
-	c[mNodeA] = 0;
-	bool vst[MAX_GROUP][4];
-	pq.push({0,mNodeA});
-	while(!pq.empty()) {
-		auto q = pq.top();
-		pq.pop();
-		int g = q[1]/100, n = q[1]%100;
-		vst[g][n] = true;
-		c[q[1]] = q[0];
-		for(int group=0; group<=300; group++) {
-			for(int node=1; node<=3; node++) {
-				if(vst[group][node] == true) continue;
-				if(g==group && g!=0) {
-					pq.push({c[q[1]]+cost[g][n][group][node], group*100+node});
-				}
-				else {
-					if(bridge[g][n][group][node] == 0) continue;
-					pq.push({c[q[1]]+bridge[g][n][group][node], group*100+node});
-				}
-			}
-		}
-	}
-	return c[mNodeB];
+	return ldijkstra(mNodeA, mNodeB);
 }
